@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Data Submission Form</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --card-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --accent-color: #6d28d9;
+            --accent-light: #8b5cf6;
+            --input-bg: #252525;
+            --input-border: #333;
+            --input-focus: #4c1d95;
+            --required-color: #ef4444;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --glow: 0 0 15px rgba(109, 40, 217, 0.5);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 50%, #1e1e1e 0%, #0a0a0a 100%);
+        }
+        
+        /* Header Styles */
+        .header {
+            background-color: #1a1a1a;
+            padding: 15px 0;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            height: 50px;
+            margin-right: 15px;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+            background: linear-gradient(90deg, var(--accent-light), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-weight: 700;
+            font-size: 2.5rem;
+            position: relative;
+            background: linear-gradient(90deg, var(--accent-light), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-light), var(--accent-color));
+            border-radius: 2px;
+            animation: scaleX 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        @keyframes scaleX {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        
+        .form-card {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        .form-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-light), var(--accent-color));
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Stagger animations for form groups */
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+        
+        label.required:after {
+            content: " *";
+            color: var(--required-color);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: var(--glow);
+            background-color: #2a2a2a;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--accent-light), var(--accent-color));
+            color: white;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: var(--transition);
+            margin-top: 20px;
+            letter-spacing: 0.5px;
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(109, 40, 217, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        button:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover:after {
+            left: 100%;
+        }
+        
+        #responseMessage {
+            margin-top: 25px;
+            padding: 18px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            border: 1px solid transparent;
+        }
+        
+        .success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+            border-color: var(--error-color);
+        }
+        
+        .vitals-container {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            background-color: rgba(109, 40, 217, 0.05);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px dashed rgba(109, 40, 217, 0.3);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .vitals-container .form-group {
+            margin-bottom: 0;
+        }
+        
+        .floating-label {
+            position: absolute;
+            left: 16px;
+            top: 14px;
+            color: #888;
+            transition: var(--transition);
+            pointer-events: none;
+            font-size: 0.95rem;
+            background-color: var(--input-bg);
+            padding: 0 5px;
+            border-radius: 4px;
+        }
+        
+        input:focus + .floating-label,
+        input:not(:placeholder-shown) + .floating-label,
+        select:focus + .floating-label,
+        select:valid + .floating-label {
+            top: -10px;
+            left: 12px;
+            font-size: 0.75rem;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 0 8px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(109, 40, 217, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0); }
+        }
+        
+        /* Modern select dropdown arrow */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        select:focus {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e0e0e0'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+        }
+        
+        /* Footer Styles */
+        .footer {
+            background-color: #1a1a1a;
+            padding: 20px 0;
+            border-top: 1px solid #333;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        @media (max-width: 992px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .vitals-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .form-card {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 30px;
+            }
+            
+            .vitals-container {
+                grid-template-columns: 1fr;
+                padding: 20px 15px;
+            }
+            
+            .header-title {
+                font-size: 1.2rem;
+            }
+            
+            .logo {
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section with Logo -->
+    <header class="header">
+        <div class="header-content">
+            <!-- Replace src with your actual logo path -->
+            <img src="https://via.placeholder.com/50x50" alt="Natunpran Logo" class="logo">
+            <h2 class="header-title">PURULIA NATUN PRAN</h2>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h1 class="animate__animated animate__fadeIn">Patient Registration</h1>
+        
+        <div class="form-card animate__animated animate__fadeInUp">
+            <form id="patientForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <input type="text" id="patientName" name="patientName" required placeholder=" ">
+                            <label for="patientName" class="floating-label required">Patient Name</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <select id="gender" name="gender" required>
+                                <option value="" selected disabled></option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <label for="gender" class="floating-label required">Gender</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <input type="number" id="age" name="age" min="0" max="120" required placeholder=" ">
+                            <label for="age" class="floating-label required">Age</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <input type="text" id="address" name="address" required placeholder=" ">
+                            <label for="address" class="floating-label required">Address</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <input type="tel" id="contactNo" name="contactNo" required placeholder=" ">
+                            <label for="contactNo" class="floating-label required">Contact Number</label>
+                        </div>
+                    </div>
+                    
+                    <div class="vitals-container">
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input type="text" id="bp" name="bp" placeholder="120/80 mmHg">
+                                <label for="bp" class="floating-label">Blood Pressure</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input type="number" id="pulse" name="pulse" min="30" max="200" placeholder=" ">
+                                <label for="pulse" class="floating-label">Pulse Rate (bpm)</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input type="number" id="spo2" name="spo2" min="0" max="100" placeholder=" ">
+                                <label for="spo2" class="floating-label">SpO2 (%)</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input type="number" id="height" name="height" min="50" max="250" step="0.1" placeholder=" ">
+                                <label for="height" class="floating-label">Height (cm)</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input type="number" id="weight" name="weight" min="0" max="300" step="0.1" placeholder=" ">
+                                <label for="weight" class="floating-label">Weight (kg)</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <input type="number" id="bmi" name="bmi" min="0" max="100" step="0.1" readonly placeholder=" ">
+                                <label for="bmi" class="floating-label">BMI</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-wrapper">
+                                <select id="bmiCategory" name="bmiCategory" disabled>
+                                    <option value="" selected disabled></option>
+                                    <option value="Underweight">Underweight (<18.5)</option>
+                                    <option value="Normal weight">Normal weight (18.5-24.9)</option>
+                                    <option value="Overweight">Overweight (25-29.9)</option>
+                                    <option value="Obesity">Obesity (≥30)</option>
+                                </select>
+                                <label for="bmiCategory" class="floating-label">BMI Category</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+                    <span class="button-text">Submit Patient Data & Download Precribtion</span>
+                </button>
+            </form>
+            
+            <div id="responseMessage"></div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Software developed by DSC Innovation Hub</p>
+            <p>Copyright © 2023 DSC Innovation Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Add floating label functionality
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', function() {
+                const label = this.nextElementSibling;
+                if (label && label.classList.contains('floating-label')) {
+                    label.style.color = 'white';
+                    label.style.backgroundColor = 'var(--accent-color)';
+                }
+            });
+            
+            element.addEventListener('blur', function() {
+                const label = this.nextElementSibling;
+                if (label && label.classList.contains('floating-label') && !this.value) {
+                    label.style.color = '#888';
+                    label.style.backgroundColor = 'var(--input-bg)';
+                }
+            });
+        });
+        
+        // Calculate BMI when height or weight changes
+        document.getElementById('height').addEventListener('input', calculateBMI);
+        document.getElementById('weight').addEventListener('input', calculateBMI);
+
+        function calculateBMI() {
+            const height = parseFloat(document.getElementById('height').value) / 100; // convert cm to m
+            const weight = parseFloat(document.getElementById('weight').value);
+            
+            if (height && weight) {
+                const bmi = (weight / (height * height)).toFixed(1);
+                document.getElementById('bmi').value = bmi;
+                
+                // Set BMI category
+                const bmiCategory = document.getElementById('bmiCategory');
+                bmiCategory.disabled = false;
+                
+                if (bmi < 18.5) {
+                    bmiCategory.value = "Underweight";
+                } else if (bmi >= 18.5 && bmi <= 24.9) {
+                    bmiCategory.value = "Normal weight";
+                } else if (bmi >= 25 && bmi <= 29.9) {
+                    bmiCategory.value = "Overweight";
+                } else {
+                    bmiCategory.value = "Obesity";
+                }
+                
+                // Trigger floating label update
+                bmiCategory.dispatchEvent(new Event('change'));
+            }
+        }
+
+        // Function to generate QR code
+        function generateQRCode(text, size = 150) {
+            const qr = qrcode(0, 'L');
+            qr.addData(text);
+            qr.make();
+            return qr.createDataURL(8, size / 10);
+        }
+
+        // Function to generate PDF with dark theme
+        function generatePDF(data) {
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Add dark header with gradient
+            doc.setFillColor(100, 100, 200);
+            doc.rect(0, 0, 210, 30, 'F');
+            
+            // Add organization name
+            doc.setFontSize(16);
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Purulia Natun Pran Cancer Organization', 105, 18, { align: 'center' });
+            
+            // Add contact info
+            doc.setFontSize(9);
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Phone: 0671-2304262/0671-2304683 | Email: pnpcancerorg@gmail.com', 105, 24, { align: 'center' });
+            doc.text('Purulia, West Bengal - 723101', 105, 28, { align: 'center' });
+
+            // Add decorative line
+            doc.setDrawColor(109, 40, 217);
+            doc.setLineWidth(0.8);
+            doc.line(15, 32, 195, 32);
+
+            // Add patient details section
+            doc.setFontSize(12);
+            doc.setTextColor(109, 40, 217);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PATIENT INFORMATION', 15, 42);
+
+
+            // Patient details
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('helvetica', 'normal');
+            
+            doc.text(`Patient Name: ${data.patientName}`, 20, 50);
+            doc.text(`Age/Sex: ${data.age} Y / ${data.gender}`, 20, 56);
+            doc.text(`Address: ${data.address}`, 20, 62);
+            doc.text(`Contact: ${data.contactNo}`, 20, 68);
+            
+            const currentDate = new Date().toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            
+            doc.text(`Registration Date: ${currentDate}`, 20, 74);
+
+            // Add QR code with modern border
+            const qrData = {
+                id: data.uniqueId || 'DSC/VSC/001/25',
+                name: data.patientName,
+                age: data.age,
+                gender: data.gender,
+                date: currentDate
+            };
+            
+            const qrCodeImg = generateQRCode(JSON.stringify(qrData), 40);
+            doc.addImage(qrCodeImg, 'PNG', 150, 40, 40, 40);
+            
+            // Add border around QR code
+            doc.setDrawColor(109, 40, 217);
+            doc.setLineWidth(0.8);
+            doc.roundedRect(148, 38, 44, 44, 2, 2, 'S');
+            
+           
+            // Add vital signs section
+            doc.setFontSize(12);
+            doc.setTextColor(109, 40, 217);
+            doc.setFont('helvetica', 'bold');
+            doc.text('VITAL SIGNS', 15, 90);
+            
+  
+
+            // Vital signs data
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('helvetica', 'normal');
+            
+            // Create a modern table-like layout
+            const vitalSigns = [
+                { label: 'Blood Pressure', value: data.bp || '--', unit: 'mmHg' },
+                { label: 'Pulse Rate', value: data.pulse || '--', unit: 'bpm' },
+                { label: 'SpO2', value: data.spo2 || '--', unit: '%' },
+                { label: 'Height', value: data.height || '--', unit: 'cm' },
+                { label: 'Weight', value: data.weight || '--', unit: 'kg' },
+                { label: 'BMI', value: data.bmi || '--', unit: data.bmiCategory || '--' }
+            ];
+            
+            let yPos = 98;
+            vitalSigns.forEach((sign, index) => {
+                if (index % 2 === 0 && index !== 0) yPos += 8;
+                
+                const xPos = index % 2 === 0 ? 20 : 110;
+                
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(109, 40, 217);
+                doc.text(`${sign.label}:`, xPos, yPos);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(0, 0, 0);
+                doc.text(`${sign.value} ${sign.unit}`, xPos + 30, yPos);
+            });
+
+    // Divider line
+    doc.setDrawColor(0, 102, 204); // Blue line
+    doc.setLineWidth(0.5);
+    doc.line(10, 118, 200, 118);
+
+// Divider line
+doc.setDrawColor(0, 102, 204); // Blue line
+doc.setLineWidth(0.5);
+doc.line(50, 118, 50, 297); // Vertical line at x=105, from y=10 to y=200
+
+doc.setFontSize(12);
+            doc.setTextColor(0, 0, 50);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Clinical Notes', 11, 125);
+doc.text('Advice', 115, 125);
+
+
+
+            // Add footer
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Software developed by DSC Innovation Hub Purulia', 105, 290, { align: 'center' });
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, 294, { align: 'center' });
+
+            // Save the PDF with a modern filename
+            doc.save(`Patient_Record_${data.patientName.replace(/\s+/g, '_')}_${currentDate.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        // Form submission with animations
+        document.getElementById('patientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state with animation
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const buttonText = submitBtn.querySelector('.button-text');
+            
+            submitBtn.disabled = true;
+            buttonText.textContent = 'Processing...';
+            submitBtn.classList.add('pulse-animation');
+            
+            // Get the form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Add current date
+            data.admissionDate = new Date().toLocaleString();
+            
+            // Your Google Apps Script web app URL
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzd88mEASSAGeHUaBIAB8Kd6KLNDa-hgHfD-q18tE1QHK51a5YuovajYPk0XXAiylFIrQ/exec';
+            
+            // Send the data to Google Apps Script
+            fetch(scriptUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(data).toString()
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(responseData => {
+                const responseDiv = document.getElementById('responseMessage');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'success animate__animated animate__fadeIn';
+                responseDiv.textContent = 'Data submitted successfully! Generating PDF...';
+                
+                // Generate PDF with the submitted data
+                generatePDF(data);
+                
+                // Reset form after a delay
+                setTimeout(() => {
+                    document.getElementById('patientForm').reset();
+                    responseDiv.textContent = 'Data submitted and PDF downloaded successfully!';
+                    
+                    // Reset button state
+                    setTimeout(() => {
+                        submitBtn.classList.remove('pulse-animation');
+                        buttonText.textContent = 'Submit Another Patient';
+                    }, 500);
+                }, 2000);
+            })
+            .catch(error => {
+                const responseDiv = document.getElementById('responseMessage');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'error animate__animated animate__headShake';
+                responseDiv.textContent = 'Error: ' + error.message;
+                console.error('Error:', error);
+                
+                // Still generate PDF even if submission fails
+                generatePDF(data);
+                
+                // Reset button state
+                setTimeout(() => {
+                    submitBtn.classList.remove('pulse-animation');
+                    buttonText.textContent = 'Try Again';
+                    submitBtn.disabled = false;
+                }, 1000);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
