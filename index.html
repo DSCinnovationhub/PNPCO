@@ -522,7 +522,7 @@
             doc.setFontSize(8);
             doc.setTextColor(0, 0, 0);
             doc.text('© DSC Innovation Hub Purulia', 105, 70, { align: 'center' });
-            doc.text('Note: This is only a rapid test. For comprehensive results, please visit a pathology laboratory.', 105, 74, { align: 'center', 'bold'});
+            doc.text('Note: This is only a rapid test. For comprehensive results, please visit a pathology laboratory.', 105, 74, { align: 'center'});
             
             // Save the PDF
             doc.save(`Blood_Test_${data.studentName.replace(/\s+/g, '_')}.pdf`);
