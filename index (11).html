@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Group Test Form</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --bg-color: #0a0a1a;
+            --card-color: #0f0f2d;
+            --text-color: #e0e0ff;
+            --accent-color: #00a8ff;
+            --accent-light: #00f2ff;
+            --input-bg: #151530;
+            --input-border: #252545;
+            --input-focus: #0066ff;
+            --required-color: #ff3860;
+            --success-color: #00ffaa;
+            --error-color: #ff3860;
+            --shadow: 0 0 20px rgba(0, 168, 255, 0.2);
+            --glow: 0 0 15px rgba(0, 242, 255, 0.5);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --border-radius: 10px;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 168, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.1) 0%, transparent 20%);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, rgba(0, 168, 255, 0.2), rgba(0, 242, 255, 0.2));
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0, 168, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0, 168, 255, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            height: 50px;
+            margin-right: 15px;
+            filter: drop-shadow(0 0 5px var(--accent-light));
+        }
+        
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            text-shadow: 0 0 10px var(--accent-color);
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 2.5rem;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            text-shadow: 0 0 15px rgba(0, 168, 255, 0.5);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-light));
+            border-radius: 3px;
+            transform: scaleX(0.5);
+            animation: scaleX 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+        
+        @keyframes scaleX {
+            from { transform: scaleX(0.5); }
+            to { transform: scaleX(1); }
+        }
+        
+        .form-card {
+            background-color: rgba(15, 15, 45, 0.7);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 168, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .form-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-color), var(--accent-light));
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+        
+        label.required:after {
+            content: " *";
+            color: var(--required-color);
+            text-shadow: 0 0 5px rgba(255, 56, 96, 0.5);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: var(--glow);
+            background-color: rgba(0, 168, 255, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+            color: #0a0a1a;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: var(--transition);
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 168, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 168, 255, 0.5);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #252545;
+            color: #666;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        button:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover:after {
+            left: 100%;
+        }
+        
+        #responseMessage {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+            border: 1px solid transparent;
+            font-weight: 500;
+        }
+        
+        .success {
+            background-color: rgba(0, 255, 170, 0.1);
+            color: var(--success-color);
+            border-color: var(--success-color);
+            text-shadow: 0 0 5px rgba(0, 255, 170, 0.3);
+        }
+        
+        .error {
+            background-color: rgba(255, 56, 96, 0.1);
+            color: var(--error-color);
+            border-color: var(--error-color);
+            text-shadow: 0 0 5px rgba(255, 56, 96, 0.3);
+        }
+        
+        .footer {
+            background-color: rgba(10, 10, 26, 0.8);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c75a0;
+            margin-top: 40px;
+            border-top: 1px solid rgba(0, 168, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .footer a {
+            color: var(--accent-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer a:hover {
+            text-shadow: 0 0 5px var(--accent-light);
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-card {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <img src="https://via.placeholder.com/50x50" alt="Organization Logo" class="logo">
+            <h2 class="header-title">BLOOD GROUP TEST</h2>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h1 class="animate__animated animate__fadeIn">BLOOD GROUP TEST FORM</h1>
+        
+        <div class="form-card animate__animated animate__fadeInUp">
+            <form id="bloodTestForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <input type="text" id="studentName" name="studentName" required placeholder=" ">
+                            <label for="studentName" class="floating-label required">Student Name</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <input type="text" id="guardianName" name="guardianName" required placeholder=" ">
+                            <label for="guardianName" class="floating-label required">Guardian's Name</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <input type="text" id="studentClass" name="studentClass" required placeholder=" ">
+                            <label for="studentClass" class="floating-label required">Class</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <select id="gender" name="gender" required>
+                                <option value="" selected disabled></option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <label for="gender" class="floating-label required">Gender</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            <select id="school" name="school" required>
+                                <option value="" selected disabled></option>
+                                <option value="Gandhi Vidyalay Purulia">Gandhi Vidyalay Purulia</option>
+                                <option value="Nadiha Dudkidih Primary School">Nadiha Dudkidih Primary School</option>
+                            </select>
+                            <label for="school" class="floating-label required">School</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+                    <span class="button-text">GENERATE TEST FORM</span>
+                </button>
+            </form>
+            
+            <div id="responseMessage"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2023 DSC Innovation Hub Purulia. All rights reserved.</p>
+            <p>For more information contact hospital administration</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Function to generate PDF in 210mm x 75mm size
+        function generatePDF(data) {
+            // Create PDF in custom size (210mm x 75mm)
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: [210, 75]
+            });
+
+            // Add dark blue background
+            doc.setFillColor(255, 255, 255);
+            doc.rect(0, 0, 210, 75, 'F');
+            
+            // Add organization name
+            doc.setFontSize(16);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PURULIA NATUN PRAN CANCER ORGANIZATION', 105, 7, { align: 'center' });
+
+   // Add program name
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Ward. 9, Professor Colony | J.K. College Road bye lane | PO. & Dist. Purulia', 105, 12, { align: 'center' });
+
+            
+            // Add blue divider line
+            doc.setDrawColor(0, 168, 255);
+            doc.setLineWidth(0.5);
+            doc.line(20, 14, 190, 14);
+
+
+// Add program name
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Blood Gourp Test ', 105, 19, { align: 'center' });
+            
+            // Student information section
+            doc.setFontSize(11);
+            doc.setTextColor(0, 0, 0);
+            doc.setFont('helvetica', 'normal');
+            
+            // Left column
+            doc.text(`Name: ${data.studentName}`, 25, 24);
+            doc.text(`Class: ${data.studentClass}`, 25, 29);
+            
+            // Right column
+            doc.text(`Guardian: ${data.guardianName}`, 120, 24);
+            doc.text(`Gender: ${data.gender}`, 120, 29);
+            
+            // School information
+            doc.text(`School: ${data.school}`, 25, 34);
+            
+            // Add second blue divider line
+            doc.setDrawColor(0, 168, 255);
+            doc.setLineWidth(0.5);
+            doc.line(20, 38, 190, 38);
+            
+            // Blood group test section
+            doc.setFontSize(14);
+            doc.setTextColor(0, 0, 0);
+            doc.text('BLOOD GROUP TEST RESULT', 105, 43, { align: 'center' });
+            
+            // Blood type options
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text('Blood Type:', 50, 48);
+            doc.text('A', 90, 53);
+            doc.text('B', 110, 53);
+            doc.text('AB', 130, 53);
+	    doc.text('O', 150, 53);
+            
+            // Add squares for manual selection
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(0.3);
+            doc.rect(96, 50, 5, 5); // A box
+            doc.rect(116, 50, 5, 5); // B box
+            doc.rect(136, 50, 5, 5); // AB box
+            doc.rect(156, 50, 5, 5); // O box
+            
+            // Rh factor options
+            doc.text('Rh Factor:', 50, 58);
+            doc.text('+', 90, 63);
+            doc.text('-', 110, 63);
+            
+            // Add squares for manual selection
+            doc.rect(96, 60, 5, 5); // + box
+            doc.rect(116, 60, 5, 5); // - box
+
+            // Add second blue divider line
+            doc.setDrawColor(0, 168, 255);
+            doc.setLineWidth(0.5);
+            doc.line(20, 67, 190, 67);
+            
+            // Footer
+            doc.setFontSize(8);
+            doc.setTextColor(0, 0, 0);
+            doc.text('© DSC Innovation Hub Purulia', 105, 70, { align: 'center' });
+            doc.text('For more information contact hospital administration', 105, 74, { align: 'center' });
+            
+            // Save the PDF
+            doc.save(`Blood_Test_${data.studentName.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        // Form submission
+        document.getElementById('bloodTestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const buttonText = submitBtn.querySelector('.button-text');
+            
+            submitBtn.disabled = true;
+            buttonText.textContent = 'PROCESSING...';
+            submitBtn.classList.add('pulse-animation');
+            
+            // Get the form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Add timestamp
+            data.timestamp = new Date().toISOString();
+            
+            // Your Google Apps Script web app URL
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbx99udFVHuWLh9ZozqA04duy1Lzzmh0nTbf2fjFvCtm-ltSbIIY2AtOLmt5Y1fvAKcR/exec';
+            
+            // Send data to Google Sheet
+            fetch(scriptUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(data).toString()
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(responseData => {
+                const responseDiv = document.getElementById('responseMessage');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'success animate__animated animate__fadeIn';
+                responseDiv.textContent = 'Data submitted successfully! Generating test form...';
+                
+                // Generate PDF
+                generatePDF(data);
+                
+                // Reset form after a delay
+                setTimeout(() => {
+                    document.getElementById('bloodTestForm').reset();
+                    responseDiv.textContent = 'Data submitted and test form generated!';
+                    
+                    setTimeout(() => {
+                        submitBtn.classList.remove('pulse-animation');
+                        buttonText.textContent = 'GENERATE ANOTHER FORM';
+                    }, 500);
+                }, 2000);
+            })
+            .catch(error => {
+                const responseDiv = document.getElementById('responseMessage');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'error animate__animated animate__headShake';
+                responseDiv.textContent = 'Error: ' + error.message;
+                console.error('Error:', error);
+                
+                // Still generate PDF even if submission fails
+                generatePDF(data);
+                
+                setTimeout(() => {
+                    submitBtn.classList.remove('pulse-animation');
+                    buttonText.textContent = 'TRY AGAIN';
+                    submitBtn.disabled = false;
+                }, 1000);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
